@@ -3,6 +3,7 @@
 const bcrypt = require('bcrypt');
 
 module.exports = exports = function (schema, options) {
+	options = options || {};
 	options.saltWorkFactor = options.saltWorkFactor || 10;
 	options.maxAuthAttempts = options.maxAuthAttempts || 15;
 	options.accountLockTime = options.accountLockTime || (60 * 60);

@@ -10,18 +10,14 @@ npm install mongoose-user-auth
 
 ## Usage
 
-1. Bind to a schema. The fields `password`, `authAttempts`, and `lockUntil` will be added to the schema.
+1. Plug in to a schema. The fields `password`, `authAttempts`, and `lockUntil` will be added to the schema.
 ```
-var userSchema = new Schema({
-	// ...
-}, {
+userSchema.plugin(require('mongoose-user-auth'), {
 	// These are optional. The values below are the defaults
 	saltWorkFactor: 10,
 	maxAuthAttempts: 15,
-	accountLockTime: 60 * 60 // seconds
+	accountLockTime: 3600 // 1 hour
 });
-
-userSchema.plugin(require('mongoose-user-auth'));
 ```
 
 2. Use the `auth` method for user authentications.
