@@ -31,9 +31,14 @@ User.auth({ username: username }, password, function (err, user) {
 		// There has been an error
 		return;
 	}
+	
+	if (!user) {
+		// User was not found
+		return;
+	}
 
 	if (user.isLocked) {
-		// This account is locked
+		// Account is locked
 		var lockedUntil = user.lockUntil; // ms
 		return;
 	}
