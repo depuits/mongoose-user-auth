@@ -1,0 +1,44 @@
+{
+  "name": "mongoose-user-auth",
+  "description": "Mongoose plugin which hashes passwords and locks accounts with too many failed authentications.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "keywords": [
+    "mongoose",
+    "user",
+    "account",
+    "password",
+    "hash",
+    "hashing",
+    "auth",
+    "authenticate",
+    "authentication"
+  ],
+  "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/milesbarr/mongoose-user-auth.git"
+  },
+  "dependencies": {
+    "bcrypt": "^1.0.2"
+  },
+  "devDependencies": {},
+  "author": {
+    "name": "Miles Barr",
+    "email": "milesbarr2@gmail.com"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "scripts": {},
+  "bugs": {
+    "url": "https://github.com/milesbarr/mongoose-user-auth/issues"
+  },
+  "homepage": "https://github.com/milesbarr/mongoose-user-auth#readme",
+  "maintainers": [
+    {
+      "name": "Miles Barr",
+      "email": "milesbarr2@gmail.com"
+    }
+  ]
+}
