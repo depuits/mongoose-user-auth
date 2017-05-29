@@ -1,17 +1,17 @@
 # Mongoose User Auth
-Mongoose plugin for hashing passwords and locking accounts with too many failed authentications.
+Mongoose plugin to hash passwords and lock accounts after too many failed authentications.
 
 Credit goes to: http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
 
 ## Installation
-```
+```bash
 npm install mongoose-user-auth
 ```
 
 ## Usage
 
 1. Plug in to a schema. The fields `password`, `authAttempts`, and `lockUntil` will be added to the schema.
-```
+```js
 userSchema.plugin(require('mongoose-user-auth'), {
 	// These are optional. The values below are the defaults
 	saltWorkFactor: 10,
@@ -20,8 +20,8 @@ userSchema.plugin(require('mongoose-user-auth'), {
 });
 ```
 
-2. Use the `auth` method for user authentications.
-```
+2. Use the `auth` method to authenticate users
+```js
 User.auth({ username: username }, password, function (err, user) {
 	if (err) {
 		// There has been an error
