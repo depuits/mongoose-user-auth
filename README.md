@@ -10,9 +10,11 @@ npm install mongoose-user-auth
 
 ## Usage
 
-1. Add to a schema
+1. Add to a Mongoose schema
 ```js
-userSchema.plugin(require('mongoose-user-auth'), {
+var mongooseUserAuth = require('mongoose-user-auth');
+
+userSchema.plugin(mongooseUserAuth, {
 	saltWorkFactor: 10, // optional
 	maxAuthAttempts: 15, // optional
 	accountLockTime: 3600 // optional
