@@ -1,5 +1,5 @@
 # Mongoose User Auth
-Mongoose plugin which hashes passwords and locks accounts after too many failed authentications.
+Hash passwords and lock accounts in Mongoose.
 
 Credit goes to: http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
 

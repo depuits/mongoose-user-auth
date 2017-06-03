@@ -1,7 +1,7 @@
 {
   "name": "mongoose-user-auth",
-  "description": "Mongoose plugin which hashes passwords and locks accounts after too many failed authentications.",
-  "version": "1.0.4",
+  "description": "Hash passwords and lock accounts in Mongoose.",
+  "version": "1.0.5",
   "license": "MIT",
   "keywords": [
     "mongoose",
