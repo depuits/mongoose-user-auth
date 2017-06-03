@@ -1,6 +1,4 @@
-'use strict';
-
-const bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt');
 
 module.exports = exports = function (schema, options) {
 	options = options || {};
@@ -26,14 +24,14 @@ module.exports = exports = function (schema, options) {
 		}
 
 		// Generate salt
-		bcrypt.genSalt(options.saltWorkFactor, (err, salt) => {
+		bcrypt.genSalt(options.saltWorkFactor, function (err, salt) {
 			if (err) {
 				next(err);
 				return;
 			}
 
 			// Hash password
-			bcrypt.hash(this.password, salt, (err, hashedPassword) => {
+			bcrypt.hash(this.password, salt, function (err, hashedPassword) {
 				if (err) {
 					next(err);
 					return;
@@ -60,7 +58,7 @@ module.exports = exports = function (schema, options) {
 		}
 
 		// Increment attempts
-		const updates = { $inc: { authAttempts: 1 } };
+		var updates = { $inc: { authAttempts: 1 } };
 
 		// Lock account if reached max attempts
 		if (this.authAttempts + 1 >= options.maxAuthAttempts && !this.isLocked) {
@@ -71,7 +69,7 @@ module.exports = exports = function (schema, options) {
 	});
 
 	schema.static('auth', function (conditions, password, cb) {
-		this.findOne(conditions, (err, user) => {
+		this.findOne(conditions, function (err, user) {
 			if (err || !user) {
 				cb(err);
 				return;
@@ -79,7 +77,7 @@ module.exports = exports = function (schema, options) {
 
 			// Check if account is currently locked
 			if (user.isLocked) {
-				user.incAuthAttempts((err) => {
+				user.incAuthAttempts(function (err) {
 					if (err) {
 						cb(err);
 						return;
@@ -90,7 +88,7 @@ module.exports = exports = function (schema, options) {
 			}
 
 			// Check password
-			user.comparePassword(password, (err, isMatch) => {
+			user.comparePassword(password, function (err, isMatch) {
 				if (err) {
 					cb(err);
 					return;
@@ -98,7 +96,7 @@ module.exports = exports = function (schema, options) {
 
 				// Was the password a match?
 				if (!isMatch) {
-					user.incAuthAttempts((err) => {
+					user.incAuthAttempts(function (err) {
 						if (err) {
 							cb(err);
 						} else {
@@ -118,7 +116,7 @@ module.exports = exports = function (schema, options) {
 				user.update({
 					$set: { authAttempts: 0 },
 					$unset: { lockUntil: 1 }
-				}, (err) => {
+				}, function (err) {
 					if (err) {
 						cb(err);
 						return;
