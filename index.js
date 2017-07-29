@@ -23,6 +23,8 @@ module.exports = exports = function (schema, options) {
 			return;
 		}
 
+		var user = this;
+
 		// Generate salt
 		bcrypt.genSalt(options.saltWorkFactor, function (err, salt) {
 			if (err) {
@@ -31,13 +33,13 @@ module.exports = exports = function (schema, options) {
 			}
 
 			// Hash password
-			bcrypt.hash(this.password, salt, function (err, hashedPassword) {
+			bcrypt.hash(user.password, salt, function (err, hashedPassword) {
 				if (err) {
 					next(err);
 					return;
 				}
 
-				this.password = hashedPassword;
+				user.password = hashedPassword;
 				next();
 			});
 		});
