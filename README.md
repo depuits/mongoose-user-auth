@@ -1,9 +1,11 @@
 # Mongoose User Auth
+
 Hash passwords and lock accounts in Mongoose.
 
 Credit goes to: http://devsmash.com/blog/password-authentication-with-mongoose-and-bcrypt
 
 ## Installation
+
 ```bash
 npm install mongoose-user-auth
 ```
@@ -41,3 +43,7 @@ User.auth({ username: username }, password, function (err, user) {
 	// User is authenticated
 });
 ```
+
+## License
+
+Mongoose User Auth is released under the MIT license.
