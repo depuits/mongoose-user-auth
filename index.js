@@ -55,7 +55,9 @@ module.exports = exports = function (schema, options) {
 			this.update({
 				$set: { authAttempts: 1 },
 				$unset: { lockUntil: 1 }
-			}, cb);
+			}, function (err, result) {
+				cb(err);
+			});
 			return;
 		}
 
@@ -67,7 +69,9 @@ module.exports = exports = function (schema, options) {
 			updates.$set = { lockUntil: Date.now() + options.accountLockTime };
 		}
 		
-		this.update(updates, cb);
+		this.update(updates, function (err, result) {
+			cb(err);
+		});
 	});
 
 	schema.static('auth', function (conditions, password, cb) {
@@ -99,11 +103,7 @@ module.exports = exports = function (schema, options) {
 				// Was the password a match?
 				if (!isMatch) {
 					user.incAuthAttempts(function (err) {
-						if (err) {
-							cb(err);
-						} else {
-							cb(null, user);
-						}
+						cb(err);
 					});
 					return;
 				}
