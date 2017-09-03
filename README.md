@@ -12,39 +12,39 @@ npm install mongoose-user-auth
 
 ## Usage
 
-1. Add to a Mongoose schema.
+Add the plugin to a Mongoose schema.
 
-   ```js
-   userSchema.plugin(require('mongoose-user-auth'), {
-       saltWorkFactor: 10, // optional
-       maxAuthAttempts: 15, // optional
-       accountLockTime: 3600 // optional
-   });
-   ```
+```js
+userSchema.plugin(require('mongoose-user-auth'), {
+  saltWorkFactor: 10, // optional
+  maxAuthAttempts: 15, // optional
+  accountLockTime: 3600 // optional
+});
+```
 
-2. Authenticate users with the `auth` method.
+Authenticate users with the `auth` method.
 
-   ```js
-   User.auth({ username: username }, password, function (err, user) {
-       if (err) {
-           // There has been an error
-           return;
-       }
-	
-       if (!user) {
-           // User was not found
-           return;
-       }
+```js
+User.auth({ username: username }, password, function (err, user) {
+  if (err) {
+    // There has been an error
+    return;
+  }
 
-       if (user.isLocked) {
-           // Account is locked
-           var lockedUntil = user.lockUntil; // ms
-           return;
-       }
+  if (!user) {
+    // User was not found
+    return;
+  }
 
-       // User is authenticated
-   });
-   ```
+  if (user.isLocked) {
+    // Account is locked
+    var lockedUntil = user.lockUntil; // ms
+    return;
+  }
+
+  // User is authenticated
+});
+```
 
 ## License
 
