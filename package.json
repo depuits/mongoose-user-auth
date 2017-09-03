@@ -1,7 +1,7 @@
 {
   "name": "mongoose-user-auth",
   "description": "Hash passwords and lock accounts in Mongoose.",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "license": "MIT",
   "keywords": [
     "mongoose",
