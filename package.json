@@ -23,7 +23,12 @@
   "dependencies": {
     "bcrypt": "^1.0.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3",
+    "mongoose": "^4.11.13",
+    "sinon": "^4.0.0"
+  },
   "author": {
     "name": "Miles Barr",
     "email": "milesbarr2@gmail.com"
@@ -31,7 +36,9 @@
   "engines": {
     "node": "*"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
   "bugs": {
     "url": "https://github.com/milesbarr/mongoose-user-auth/issues"
   },
