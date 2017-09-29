@@ -49,5 +49,8 @@
       "name": "Miles Barr",
       "email": "milesbarr2@gmail.com"
     }
+  ],
+  "files": [
+    "index.js"
   ]
 }
