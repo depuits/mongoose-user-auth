@@ -76,7 +76,6 @@ module.exports = exports = function (schema, options) {
   schema.static('auth', function (conditions, password, cb) {
     this.findOne(conditions, function (err, user) {
       if (err || !user) {
-        console.log('cb1')
         cb(err);
         return;
       }
