@@ -5,7 +5,6 @@ module.exports = exports = function (schema, options) {
   options.saltWorkFactor = options.saltWorkFactor || 10;
   options.maxAuthAttempts = options.maxAuthAttempts || 15;
   options.accountLockTime = options.accountLockTime || (60 * 60);
-  options.accountLockTime *= 1000;
 
   schema.add({
     password: { type: String, required: true, maxLength: 255 },
@@ -66,7 +65,7 @@ module.exports = exports = function (schema, options) {
 
     // Lock account if reached max attempts
     if (this.authAttempts + 1 >= options.maxAuthAttempts && !this.isLocked) {
-      updates.$set = { lockUntil: Date.now() + options.accountLockTime };
+      updates.$set = { lockUntil: Date.now() + (options.accountLockTime * 1000) };
     }
     
     this.update(updates, function (err, result) {
@@ -77,6 +76,7 @@ module.exports = exports = function (schema, options) {
   schema.static('auth', function (conditions, password, cb) {
     this.findOne(conditions, function (err, user) {
       if (err || !user) {
+        console.log('cb1')
         cb(err);
         return;
       }
@@ -84,11 +84,7 @@ module.exports = exports = function (schema, options) {
       // Check if account is currently locked
       if (user.isLocked) {
         user.incAuthAttempts(function (err) {
-          if (err) {
-            cb(err);
-            return;
-          }
-          cb(null, user);
+          cb(err, user);
         });
         return;
       }
@@ -100,14 +96,16 @@ module.exports = exports = function (schema, options) {
           return;
         }
 
+        user.passwordCorrect = isMatch;
+
         // Was the password a match?
         if (!isMatch) {
           user.incAuthAttempts(function (err) {
-            cb(err);
+            cb(err, user);
           });
           return;
         }
-        
+
         // Return if the user has no failed attempts and is not locked
         if (!user.authAttempts && !user.lockUntil) {
           cb(null, user);
@@ -119,11 +117,7 @@ module.exports = exports = function (schema, options) {
           $set: { authAttempts: 0 },
           $unset: { lockUntil: 1 }
         }, function (err) {
-          if (err) {
-            cb(err);
-            return;
-          }
-          cb(null, user);
+          cb(err, user);
         });
       });
     });
