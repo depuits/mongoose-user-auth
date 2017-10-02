@@ -42,7 +42,12 @@ User.auth({ username: username }, password, function (err, user) {
     return;
   }
 
-  // User is authenticated
+  if (user.passwordCorrect) {
+    // User is authenticated
+    return;
+  }
+
+  // User password was incorrect
 });
 ```
 
