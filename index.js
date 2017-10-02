@@ -57,51 +57,36 @@ module.exports = exports = function (schema, options) {
   });
 
   schema.static('auth', function (conditions, password, cb) {
-    this.findOne(conditions, function (err, user) {
-      if (err || !user) {
-        cb(err);
+    return this.findOne(conditions).then((user) => {
+      if (!user) {
         return;
       }
 
       // Check if account is currently locked
       if (user.isLocked) {
-        user.incAuthAttempts(function (err) {
-          cb(err, user);
-        });
-        return;
+        return user.incAuthAttempts().then(() => user);
       }
 
       // Check password
-      user.comparePassword(password, function (err, isMatch) {
-        if (err) {
-          cb(err);
-          return;
-        }
-
+      return user.comparePassword(password).then((isMatch) => {
         user.passwordCorrect = isMatch;
 
         // Was the password a match?
         if (!isMatch) {
-          user.incAuthAttempts(function (err) {
-            cb(err, user);
-          });
-          return;
+          return user.incAuthAttempts().then(() => user);
         }
 
         // Return if the user has no failed attempts and is not locked
         if (!user.authAttempts && !user.lockUntil) {
-          cb(null, user);
-          return;
+          return user;
         }
 
         // Reset attempts
-        user.update({
+        return user.update({
           $set: { authAttempts: 0 },
           $unset: { lockUntil: 1 }
-        }, function (err) {
-          cb(err, user);
-        });
+        }).then(() => user);
       });
-    });
+    }).asCallback(cb);
   });
 };
