@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 var bcrypt = require('bcrypt');
 
 module.exports = exports = function (schema, options) {
@@ -22,42 +23,26 @@ module.exports = exports = function (schema, options) {
       return;
     }
 
-    var user = this;
-
-    // Generate salt
-    bcrypt.genSalt(options.saltWorkFactor, function (err, salt) {
-      if (err) {
-        next(err);
-        return;
-      }
-
-      // Hash password
-      bcrypt.hash(user.password, salt, function (err, hashedPassword) {
-        if (err) {
-          next(err);
-          return;
-        }
-
-        user.password = hashedPassword;
-        next();
-      });
+    // Generate salt and hash password
+    bcrypt.hash(this.password, options.saltWorkFactor).then((hashedPassword) => {
+      this.password = hashedPassword;
+      next();
+    }).catch((err) => {
+      next(err);
     });
   });
 
   schema.method('comparePassword', function (candidatePassword, cb) {
-    bcrypt.compare(candidatePassword, this.password, cb);
+    return bcrypt.compare(candidatePassword, this.password, cb);
   });
 
   schema.method('incAuthAttempts', function (cb) {
     // Check if previous lock has expired
     if (this.lockUntil && this.lockUntil < Date.now()) {
-      this.update({
+      return this.update({
         $set: { authAttempts: 1 },
         $unset: { lockUntil: 1 }
-      }, function (err, result) {
-        cb(err);
-      });
-      return;
+      }, cb);
     }
 
     // Increment attempts
@@ -68,9 +53,7 @@ module.exports = exports = function (schema, options) {
       updates.$set = { lockUntil: Date.now() + (options.accountLockTime * 1000) };
     }
     
-    this.update(updates, function (err, result) {
-      cb(err);
-    });
+    return this.update(updates, cb);
   });
 
   schema.static('auth', function (conditions, password, cb) {
