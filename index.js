@@ -1,4 +1,3 @@
-var Promise = require("bluebird");
 var bcrypt = require('bcrypt');
 
 module.exports = exports = function (schema, options) {
@@ -57,7 +56,7 @@ module.exports = exports = function (schema, options) {
   });
 
   schema.static('auth', function (conditions, password, cb) {
-    return this.findOne(conditions).then((user) => {
+    const promise = this.findOne(conditions).then((user) => {
       if (!user) {
         return;
       }
@@ -87,6 +86,12 @@ module.exports = exports = function (schema, options) {
           $unset: { lockUntil: 1 }
         }).then(() => user);
       });
-    }).asCallback(cb);
+    });
+
+    if (cb && typeof cb == 'function') {
+      promise.then(cb.bind(null, null), cb);
+    }
+
+    return promise;
   });
 };
