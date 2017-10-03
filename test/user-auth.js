@@ -25,10 +25,10 @@ userSchema.plugin(require('../index'), options);
 //Create a new collection called 'Name'
 const User = mongoose.model('user', userSchema);
 
-describe('Database Tests', function() {
+describe('Database Tests', () => {
   //Before starting the test, create a sandboxed database connection
   //Once a connection is established invoke done()
-  before(function (done) {
+  before((done) => {
     mongoose.Promise = Promise;
     mongoose.connect('mongodb://localhost:27017/testDatabase', { useMongoClient: true }).then(() => {
       console.log('We are connected to test database!');
@@ -46,167 +46,130 @@ describe('Database Tests', function() {
     });
   });
 
-  describe('Database', function() {
-    it('check duplicate passwords', function(done) {
-      Promise.join(User.findOne({ username: 'user1' }), User.findOne({ username: 'user2' }), function(u1, u2) {
+  describe('Database', () => {
+    it('check duplicate passwords', () => {
+      return Promise.join(User.findOne({ username: 'user1' }), User.findOne({ username: 'user2' }), (u1, u2) => {
         assert.exists(u1);
         assert.exists(u2);
         assert.notEqual(u1.password, u2.password, 'same passwords should not be encrypted the same');
-        done();
-      }).catch((e) => {
-        done(e);
       });
     });
 
-    it('Add user', function(done) {
-      User.create({
+    it('Add user', () => {
+      return User.create({
         username: 'user5',
         password: 'lol0124'
       }).then((u) => {
         assert.notEqual(u.password, 'lol0124', 'The password in the database should not be the plaintext');
-        done();
-      }).catch((e) => {
-        done(e);
       });
     });
 
-    it('Add duplicate user', function(done) {
-      User.create({
+    it('Add duplicate user', () => {
+      return User.create({
         username: 'user1',
         password: 'lol24'
       }).then((u) => {
-        done('error should be generated and no user');
-      }).catch((e) => { 
-        done(); 
+        throw new Error('error should be generated and no user');
+      }, (e) => { 
+        assert.exists(e);
       });
     });
 
-    it('Add user without password', function(done) {
-      User.create({
-        username: 'user1'
+    it('Add user without password', () => {
+      return User.create({
+        username: 'user17'
       }).then((u) => {
-        done('error should be generated and no user');
-      }).catch((e) => { 
-        done(); 
+        throw new Error('error should be generated and no user');
+      }, (e) => { 
+        assert.exists(e);
       });
     });
 
-    it('Find user', function(done) {
-      User.findOne({ username: 'user5' }).then((user) => {
+    it('Find user', () => {
+      return User.findOne({ username: 'user5' }).then((user) => {
         assert.exists(user);
-        done();
-      }).catch((e) => {
-        done(e);
       });
     });
 
-    it('Find invalid user', function(done) {
-      User.findOne({ username: 'imaginary' }).then((user) => {
+    it('Find invalid user', () => {
+      return User.findOne({ username: 'imaginary' }).then((user) => {
         assert.notExists(user);
-        done();
-      }).catch((e) => {
-        done(e);
       });
     });
   });
 
-  describe('User auth', function() {
-    function testValid(username, password, done) {
-      User.auth({ username: username }, password, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-
+  describe('User auth', () => {
+    function testValid(username, password) {
+      return User.auth({ username: username }, password).then((user) => {
         assert.exists(user);
         assert.isNotOk(user.isLocked);
         assert.isTrue(user.passwordCorrect);
-        done();
       });
     }
-    function testInvalidUserName(username, password, done) {
-      User.auth({ username: username }, password, function (err, user) {
-        if (err) {
-          return done(err);
-        }
+    function testInvalidUserName(username, password) {
+      return User.auth({ username: username }, password).then((user) => {
         assert.notExists(user);
-        done();
-      });      
+      });
     }
-    function testInvalidPassword(username, password, done) {
-      User.auth({ username: username }, password, function (err, user) {
-        if (err) {
-          return done(err);
-        }
+    function testInvalidPassword(username, password) {
+      return User.auth({ username: username }, password).then((user) => {
         assert.exists(user);
         assert.isNotOk(user.passwordCorrect);
-        done();
       });
     }
-    function testNotLocked(username, password, done) {
-      User.auth({ username: username }, password, function (err, user) {
-        if (err) {
-          return done(err);
-        }
+    function testNotLocked(username, password) {
+      return User.auth({ username: username }, password).then((user) => {
         assert.exists(user);
         assert.isNotOk(user.isLocked);
-        done();
       });
     }
-    function testLocked(username, password, done) {
-      User.auth({ username: username }, password, function (err, user) {
-        if (err) {
-          return done(err);
-        }
+    function testLocked(username, password) {
+      return User.auth({ username: username }, password).then((user) => {
         assert.exists(user);
         assert.isTrue(user.isLocked);
-        done();
       });
     }
 
-    it('valid', function(done) {
-      testValid('user1', 'lol', done);
+    it('valid', () => {
+      return testValid('user1', 'lol');
     });
-    it('invalid user name', function(done) {
-      testInvalidUserName('lol35', 'password', done);
+    it('invalid user name', () => {
+      return testInvalidUserName('lol35', 'password');
     });
-    it('invalid password user1', function(done) {
-      testInvalidPassword('user1', 'password', done);
+    it('invalid password user1', () => {
+      return testInvalidPassword('user1', 'password');
     });
 
-    it('valid user1', function(done) {
-      testValid('user1', 'lol', done);
+    it('valid user1', () => {
+      return testValid('user1', 'lol');
     });
 
     // 3 invalid logins should result in a lock
-    describe('locked', function() {
+    describe('locked', () => {
       // repeat an invalid login for max times
       for(let i = 0; i < options.maxAuthAttempts; ++i) {
-        it('not locked', function(done) {
-          testNotLocked('user1', 'password', done);
+        it('not locked', () => {
+          return testNotLocked('user1', 'password');
         });
       }
 
-      it('locked invalid password', function(done) {
-        testLocked('user1', 'password', done);
+      it('locked invalid password', () => {
+        return testLocked('user1', 'password');
       });
-      it('locked valid password', function(done) {
-        testLocked('user1', 'lol', done);
+      it('locked valid password', () => {
+        return testLocked('user1', 'lol');
       });
 
-      it('after lock', function(done) {
-        // increase the test timeout value to the needed + 2
-        this.timeout((options.accountLockTime + 2) * 1000);
+      it('after lock', () => {
         // await the lock time
-        setTimeout(function() {
-          testValid('user1', 'lol', done);
-        }, options.accountLockTime * 1000);
-      });      
+        return Promise.delay(options.accountLockTime * 1000).then(() => testValid('user1', 'lol'));
+      }).timeout((options.accountLockTime + 2) * 1000);
     });
   });
 
   //After all tests are finished drop database and close connection
-  after(function(done){
-    mongoose.connection.db.dropDatabase(function(){
+  after((done) => {
+    mongoose.connection.db.dropDatabase(() => {
       mongoose.connection.close(done);
     });
   });
