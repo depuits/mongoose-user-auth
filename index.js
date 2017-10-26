@@ -22,42 +22,26 @@ module.exports = exports = function (schema, options) {
       return;
     }
 
-    var user = this;
-
-    // Generate salt
-    bcrypt.genSalt(options.saltWorkFactor, function (err, salt) {
-      if (err) {
-        next(err);
-        return;
-      }
-
-      // Hash password
-      bcrypt.hash(user.password, salt, function (err, hashedPassword) {
-        if (err) {
-          next(err);
-          return;
-        }
-
-        user.password = hashedPassword;
-        next();
-      });
+    // Generate salt and hash password
+    bcrypt.hash(this.password, options.saltWorkFactor).then((hashedPassword) => {
+      this.password = hashedPassword;
+      next();
+    }).catch((err) => {
+      next(err);
     });
   });
 
   schema.method('comparePassword', function (candidatePassword, cb) {
-    bcrypt.compare(candidatePassword, this.password, cb);
+    return bcrypt.compare(candidatePassword, this.password, cb);
   });
 
   schema.method('incAuthAttempts', function (cb) {
     // Check if previous lock has expired
     if (this.lockUntil && this.lockUntil < Date.now()) {
-      this.update({
+      return this.update({
         $set: { authAttempts: 1 },
         $unset: { lockUntil: 1 }
-      }, function (err, result) {
-        cb(err);
-      });
-      return;
+      }, cb);
     }
 
     // Increment attempts
@@ -68,57 +52,46 @@ module.exports = exports = function (schema, options) {
       updates.$set = { lockUntil: Date.now() + (options.accountLockTime * 1000) };
     }
     
-    this.update(updates, function (err, result) {
-      cb(err);
-    });
+    return this.update(updates, cb);
   });
 
   schema.static('auth', function (conditions, password, cb) {
-    this.findOne(conditions, function (err, user) {
-      if (err || !user) {
-        cb(err);
+    const promise = this.findOne(conditions).then((user) => {
+      if (!user) {
         return;
       }
 
       // Check if account is currently locked
       if (user.isLocked) {
-        user.incAuthAttempts(function (err) {
-          cb(err, user);
-        });
-        return;
+        return user.incAuthAttempts().then(() => user);
       }
 
       // Check password
-      user.comparePassword(password, function (err, isMatch) {
-        if (err) {
-          cb(err);
-          return;
-        }
-
+      return user.comparePassword(password).then((isMatch) => {
         user.passwordCorrect = isMatch;
 
         // Was the password a match?
         if (!isMatch) {
-          user.incAuthAttempts(function (err) {
-            cb(err, user);
-          });
-          return;
+          return user.incAuthAttempts().then(() => user);
         }
 
         // Return if the user has no failed attempts and is not locked
         if (!user.authAttempts && !user.lockUntil) {
-          cb(null, user);
-          return;
+          return user;
         }
 
         // Reset attempts
-        user.update({
+        return user.update({
           $set: { authAttempts: 0 },
           $unset: { lockUntil: 1 }
-        }, function (err) {
-          cb(err, user);
-        });
+        }).then(() => user);
       });
     });
+
+    if (cb && typeof cb == 'function') {
+      promise.then(cb.bind(null, null), cb);
+    }
+
+    return promise;
   });
 };
