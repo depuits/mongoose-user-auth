@@ -6,6 +6,8 @@ const Schema = mongoose.Schema;
 const chai = require('chai');
 const assert = chai.assert;
 
+mongoose.set('useCreateIndex', true);
+
 const userSchema = new Schema({
   username: {
     type: String,
@@ -30,7 +32,7 @@ describe('Database Tests', () => {
   //Once a connection is established invoke done()
   before((done) => {
     mongoose.Promise = Promise;
-    mongoose.connect('mongodb://localhost:27017/testDatabase', { useMongoClient: true }).then(() => {
+    mongoose.connect('mongodb://localhost:27017/user-auth-tests', { useNewUrlParser: true }).then(() => {
       console.log('We are connected to test database!');
       return Promise.all([ 
         User.create({ username: 'user1', password: 'lol' }),

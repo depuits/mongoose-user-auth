@@ -1,7 +1,7 @@
 {
   "name": "mongoose-user-auth",
   "description": "Hash passwords and lock accounts in Mongoose.",
-  "version": "2.0.1",
+  "version": "2.1.1",
   "license": "MIT",
   "keywords": [
     "mongoose",
@@ -21,13 +21,13 @@
     "url": "git://github.com/milesbarr/mongoose-user-auth.git"
   },
   "dependencies": {
-    "bcrypt": "^1.0.2"
+    "bcrypt": "^3.0.3"
   },
   "devDependencies": {
-    "bluebird": "^3.5.0",
-    "chai": "^4.1.2",
-    "mocha": "^3.5.3",
-    "mongoose": "^4.11.13"
+    "bluebird": "^3.5.3",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "mongoose": "^5.4.2"
   },
   "author": {
     "name": "Miles Barr",
