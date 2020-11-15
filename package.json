@@ -21,7 +21,7 @@
     "url": "git://github.com/milesbarr/mongoose-user-auth.git"
   },
   "dependencies": {
-    "bcrypt": "^3.0.3"
+    "bcrypt": "^5.0.0"
   },
   "devDependencies": {
     "bluebird": "^3.5.3",
